@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Signal">
+  <meta name="theme-color" content="#000000">
+  <title>Signal</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icons/signal-180.png">
+  <link rel="icon" href="icons/signal-192.png">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="header">
+    <div class="logo">SIGNAL</div>
+    <div class="header-tools">
+      <button id="editBtn" class="edit-btn" aria-label="Edit stations">EDIT</button>
+      <time class="clock" id="clock">00:00:00</time>
+    </div>
+  </header>
+
+  <main id="grid" class="list" aria-label="Radio stations"></main>
+
+  <button id="playPauseBtn" class="fab" aria-label="Play" disabled>
+    <span id="playPauseIcon" class="icon-play" aria-hidden="true"></span>
+  </button>
+
+  <footer class="ticker" id="statusbar" aria-live="polite">
+    <div class="ticker-inner" id="ticker">TAP A FREQUENCY TO TUNE IN</div>
+  </footer>
+
+  <dialog id="stationDialog">
+    <form id="stationForm" method="dialog">
+      <h2 id="dialogTitle">ADD STATION</h2>
+
+      <div id="searchSection">
+        <label>SEARCH STATION
+          <input type="search" id="fieldSearch" placeholder="E.G. WDR 4" autocomplete="off">
+        </label>
+        <div id="searchResults" class="results"></div>
+        <div class="dialog-actions">
+          <button type="button" id="manualBtn" class="btn link">ENTER URL MANUALLY</button>
+          <button type="button" id="cancelBtn2" class="btn">CANCEL</button>
+        </div>
+      </div>
+
+      <div id="manualSection" class="hidden">
+        <label>NAME
+          <input type="text" id="fieldName" required placeholder="E.G. RADIO SWISS JAZZ" autocomplete="off">
+        </label>
+        <label>STREAM URL
+          <input type="url" id="fieldUrl" required placeholder="HTTPS://.../STREAM" autocomplete="off">
+        </label>
+        <div class="dialog-actions">
+          <button type="button" id="deleteBtn" class="btn danger hidden">DELETE</button>
+          <button type="button" id="cancelBtn" class="btn">CANCEL</button>
+          <button type="submit" id="saveBtn" class="btn primary">SAVE</button>
+        </div>
+      </div>
+    </form>
+  </dialog>
+
+  <audio id="audio" preload="none"></audio>
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#f3ead8">
+<title>Frequenz — retro dial</title>
+<style>
+  :root {
+    --paper: #f3ead8;
+    --ink: #2b2016;
+    --ink-dim: #8a7a63;
+    --hot: #d95b29;
+    --wood: #4a3220;
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: Georgia, "Times New Roman", serif;
+    display: flex;
+    flex-direction: column;
+    padding-top: var(--safe-top);
+    overflow: hidden;
+    background-image: radial-gradient(circle at 50% -20%, #fbf5e8 0%, var(--paper) 60%);
+  }
+
+  header {
+    text-align: center;
+    padding: 18px 20px 6px;
+  }
+  header h1 {
+    font-size: 15px;
+    letter-spacing: 0.45em;
+    text-transform: uppercase;
+    color: var(--ink-dim);
+    font-weight: 400;
+  }
+
+  /* ---- Now playing stage ---- */
+  .stage {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    padding: 10px 24px;
+    min-height: 0;
+  }
+  .station-logo {
+    width: 130px;
+    height: 130px;
+    object-fit: contain;
+    filter: sepia(0.25) drop-shadow(0 10px 24px rgba(43, 32, 22, 0.35));
+    border-radius: 22px;
+  }
+  .initials {
+    width: 130px; height: 130px;
+    border-radius: 22px;
+    background: var(--wood);
+    color: var(--paper);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 52px; font-style: italic;
+    box-shadow: inset 0 0 0 4px var(--paper), inset 0 0 0 5px var(--ink-dim);
+  }
+  .np-label {
+    font-size: 11px;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--hot);
+    font-family: "Courier New", monospace;
+    font-weight: 700;
+  }
+  .station-name {
+    font-size: 30px;
+    font-style: italic;
+    text-align: center;
+    line-height: 1.15;
+    min-height: 70px;
+  }
+  .freq {
+    font-family: "Courier New", monospace;
+    font-weight: 700;
+    font-size: 20px;
+    color: var(--ink-dim);
+    letter-spacing: 0.1em;
+  }
+  .freq b { color: var(--ink); }
+
+  /* VU meter */
+  .vu {
+    display: flex;
+    gap: 6px;
+    align-items: flex-end;
+    height: 34px;
+    margin-top: 4px;
+  }
+  .vu i {
+    width: 7px;
+    border-radius: 3px 3px 0 0;
+    background: linear-gradient(to top, var(--wood), var(--hot));
+    height: 8px;
+    transition: height 0.18s ease;
+  }
+  body.playing .vu i { animation: vu 0.9s ease-in-out infinite; }
+  .vu i:nth-child(2) { animation-delay: 0.12s; }
+  .vu i:nth-child(3) { animation-delay: 0.24s; }
+  .vu i:nth-child(4) { animation-delay: 0.06s; }
+  .vu i:nth-child(5) { animation-delay: 0.3s; }
+  .vu i:nth-child(6) { animation-delay: 0.18s; }
+  .vu i:nth-child(7) { animation-delay: 0.27s; }
+  @keyframes vu {
+    0%, 100% { height: 8px; }
+    40% { height: 32px; }
+    70% { height: 14px; }
+  }
+
+  /* ---- Dial ---- */
+  .dial {
+    position: relative;
+    margin: 0 18px;
+    padding: 0 0 var(--safe-bottom);
+    user-select: none;
+  }
+  .dial-scale {
+    position: relative;
+    height: 74px;
+    border-radius: 18px 18px 0 0;
+    background: linear-gradient(#5b4028, var(--wood));
+    box-shadow: inset 0 2px 8px rgba(0,0,0,0.45);
+    overflow: hidden;
+  }
+  .tick {
+    position: absolute;
+    bottom: 34px;
+    width: 2px;
+    height: 14px;
+    background: #c9b795;
+    opacity: 0.55;
+  }
+  .tick.major { height: 24px; opacity: 0.9; }
+  .needle {
+    position: absolute;
+    left: 50%;
+    bottom: 6px;
+    width: 3px;
+    height: 58px;
+    background: var(--hot);
+    border-radius: 2px;
+    box-shadow: 0 0 10px rgba(217, 91, 41, 0.9);
+    transition: left 0.45s cubic-bezier(0.3, 1.2, 0.4, 1);
+    z-index: 2;
+  }
+  .needle::before {
+    content: "";
+    position: absolute;
+    top: -7px; left: -4px;
+    border: 5.5px solid transparent;
+    border-top-color: var(--hot);
+  }
+
+  /* ---- Presets ---- */
+  .presets {
+    display: flex;
+    justify-content: center;
+    gap: 14px;
+    padding: 16px 16px calc(20px + var(--safe-bottom));
+    background: linear-gradient(#5b4028, #3d2a18);
+    margin: 0 18px;
+    border-radius: 0 0 18px 18px;
+  }
+  .preset {
+    width: 62px;
+    height: 62px;
+    border-radius: 50%;
+    border: 2px solid #c9b795;
+    background: var(--paper);
+    cursor: pointer;
+    font-family: Georgia, serif;
+    font-style: italic;
+    font-size: 12.5px;
+    line-height: 1.1;
+    color: var(--ink);
+    padding: 4px;
+    box-shadow: 0 3px 0 #241708;
+    transition: transform 0.1s ease, background 0.2s, color 0.2s;
+  }
+  .preset:active { transform: translateY(2px); box-shadow: 0 1px 0 #241708; }
+  .preset.active {
+    background: var(--hot);
+    border-color: #f0b48f;
+    color: #fff7ec;
+    box-shadow: 0 3px 0 #241708, 0 0 18px rgba(217, 91, 41, 0.55);
+  }
+</style>
+</head>
+<body>
+  <header><h1>Frequenz</h1></header>
+
+  <section class="stage">
+    <span id="logoWrap"></span>
+    <div id="npLabel" class="np-label">Standby</div>
+    <div id="stationName" class="station-name">Turn the dial</div>
+    <div class="freq"><b id="freqNum">—</b> <span id="unit">MHz</span></div>
+    <div class="vu"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  </section>
+
+  <section class="dial">
+    <div class="dial-scale" id="dialScale"><div class="needle" id="needle"></div></div>
+    <div class="presets" id="presets"></div>
+  </section>
+
+<script>
+  // Fake frequencies, assigned per station
+  const STATIONS = [
+    { name: "Radio Swiss Jazz", freq: "92.1", logo: "../../assets/radio-swiss-jazz.png" },
+    { name: "SmoothJazz.com.pl", freq: "103.7", logo: "../../assets/smoothjazz.png" },
+    { name: "WDR 4", freq: "97.5", logo: "../../assets/wdr4.png" },
+  ];
+
+  const dialScale = document.getElementById("dialScale");
+  const presets = document.getElementById("presets");
+  const needle = document.getElementById("needle");
+  const logoWrap = document.getElementById("logoWrap");
+  const npLabel = document.getElementById("npLabel");
+  const stationName = document.getElementById("stationName");
+  const freqNum = document.getElementById("freqNum");
+  const unit = document.getElementById("unit");
+
+  // decorative dial ticks
+  for (let i = 0; i <= 40; i++) {
+    const t = document.createElement("div");
+    t.className = "tick" + (i % 5 === 0 ? " major" : "");
+    t.style.left = (2 + i * 2.4) + "%";
+    dialScale.appendChild(t);
+  }
+
+  let active = -1;
+
+  STATIONS.forEach((s, i) => {
+    const b = document.createElement("button");
+    b.className = "preset";
+    b.textContent = s.name.split(" ")[0].slice(0, 8);
+    b.addEventListener("click", () => select(i));
+    presets.appendChild(b);
+  });
+
+  function select(i) {
+    const again = i === active;
+    active = again ? -1 : i;
+    document.querySelectorAll(".preset").forEach((b, k) =>
+      b.classList.toggle("active", k === active));
+
+    if (active === -1) {
+      document.body.classList.remove("playing");
+      npLabel.textContent = "Standby";
+      stationName.textContent = "Turn the dial";
+      freqNum.textContent = "—";
+      unit.textContent = "MHz";
+      logoWrap.innerHTML = "";
+      needle.style.left = "50%";
+      return;
+    }
+
+    const s = STATIONS[active];
+    document.body.classList.add("playing");
+    npLabel.textContent = "Now playing";
+    stationName.textContent = s.name;
+    freqNum.textContent = s.freq;
+    needle.style.left = (12 + (s.freq - 88) * 3.2) + "%";
+    logoWrap.innerHTML = "";
+    if (s.logo) {
+      const img = new Image();
+      img.className = "station-logo";
+      img.src = s.logo;
+      img.onerror = () => initials();
+      logoWrap.appendChild(img);
+    } else initials();
+
+    function initials() {
+      const d = document.createElement("div");
+      d.className = "initials";
+      d.textContent = s.name.split(" ").map(w => w[0]).slice(0, 2).join("");
+      logoWrap.innerHTML = "";
+      logoWrap.appendChild(d);
+    }
+  }
+</script>
+</body>
+</html>
