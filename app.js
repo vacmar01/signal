@@ -234,6 +234,25 @@ playPauseBtn.addEventListener("click", () => {
   if (station) togglePlay(station);
 });
 
+document.addEventListener("keydown", (event) => {
+  if (event.code !== "Space" || event.repeat || event.ctrlKey || event.altKey || event.metaKey || event.shiftKey) return;
+  if (stationDialog.open) return;
+
+  const target = event.target;
+  const isEditingText =
+    target instanceof HTMLInputElement ||
+    target instanceof HTMLTextAreaElement ||
+    target instanceof HTMLSelectElement ||
+    target.isContentEditable;
+  if (isEditingText) return;
+
+  const station = currentStation();
+  if (!station) return;
+
+  event.preventDefault();
+  togglePlay(station);
+});
+
 function updateMediaSession(station) {
   if (!("mediaSession" in navigator)) return;
   navigator.mediaSession.metadata = new MediaMetadata({
