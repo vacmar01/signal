@@ -60,6 +60,27 @@ test("station updates preserve metadata and do not mutate the previous state", (
   assert.equal(updated.stations[0].logo, "logo.png");
 });
 
+test("station changes automatically finish editing", () => {
+  const actions = [
+    {
+      type: "station/added",
+      station: { id: "three", name: "Three", url: "https://example.com/three" },
+    },
+    {
+      type: "station/updated",
+      stationId: "one",
+      changes: { name: "Updated" },
+    },
+    { type: "station/deleted", stationId: "one" },
+  ];
+
+  for (const action of actions) {
+    const editing = reducer(initialState(), { type: "ui/editing-toggled" });
+    const changed = reducer(editing, action);
+    assert.equal(changed.ui.editing, false, `${action.type} should finish editing`);
+  }
+});
+
 test("stale search responses cannot replace newer search state", () => {
   let state = reducer(initialState(), { type: "search/query-changed", query: "jazz" });
   const oldRequestId = state.search.requestId;

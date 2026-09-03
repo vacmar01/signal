@@ -38,6 +38,7 @@ export function reducer(state, action) {
       return {
         ...state,
         stations: [...state.stations, action.station],
+        ui: state.ui.editing ? { ...state.ui, editing: false } : state.ui,
       };
 
     case "station/updated": {
@@ -47,7 +48,13 @@ export function reducer(state, action) {
         changed = true;
         return { ...station, ...action.changes, id: station.id };
       });
-      return changed ? { ...state, stations } : state;
+      return changed
+        ? {
+            ...state,
+            stations,
+            ui: state.ui.editing ? { ...state.ui, editing: false } : state.ui,
+          }
+        : state;
     }
 
     case "station/deleted": {
@@ -56,6 +63,7 @@ export function reducer(state, action) {
       return {
         ...state,
         stations: state.stations.filter((station) => station.id !== action.stationId),
+        ui: state.ui.editing ? { ...state.ui, editing: false } : state.ui,
         player: deletingCurrent
           ? {
               stationId: null,
